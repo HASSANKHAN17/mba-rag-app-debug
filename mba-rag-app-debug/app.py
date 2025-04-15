@@ -11,7 +11,7 @@ st.set_page_config(page_title="MBA ASSISTANT", page_icon="assets/ai_icon.png")
 load_dotenv()
 
 # Load CSS
-st.markdown("<style>" + open("style/chatbot.css").read() + "</style>", unsafe_allow_html=True)
+# st.markdown("<style>" + open("style/chatbot.css").read() + "</style>", unsafe_allow_html=True)
 
 # Function to convert image to base64
 def get_base64_image(image_path):
