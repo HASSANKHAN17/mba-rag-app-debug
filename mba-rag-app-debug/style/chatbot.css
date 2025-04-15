@@ -1,0 +1,23 @@
+/* Custom chatbot style like ChatGPT */
+html, body, [class*="css"] {
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  .chat-message {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+  }
+  
+  .chat-message.user {
+    background-color: #70bc9a;
+  }
+  
+  .chat-message.assistant {
+    background-color: #ef9bed;
+  }
+  
