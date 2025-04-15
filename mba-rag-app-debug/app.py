@@ -6,12 +6,12 @@ import streamlit as st
 from utils.rag import query_documents
 
 # Must be first
-st.set_page_config(page_title="MBA ASSISTANT", page_icon="assets/ai_icon.png")
+st.set_page_config(page_title="MBA ASSISTANT", page_icon="mba-rag-app-debug/assets/ai_icon.png")
 
 load_dotenv()
 
 # Load CSS
-st.markdown("<style>" + open("style/chatbot.css").read() + "</style>", unsafe_allow_html=True)
+st.markdown("<style>" + open("mba-rag-app-debug/style/chatbot.css").read() + "</style>", unsafe_allow_html=True)
 
 # Function to convert image to base64
 def get_base64_image(image_path):
@@ -20,7 +20,7 @@ def get_base64_image(image_path):
     return f"data:image/png;base64,{encoded}"
 
 # Embed AI icon using base64
-img_base64 = get_base64_image("assets/ai_icon.png")
+img_base64 = get_base64_image("mba-rag-app-debug/assets/ai_icon.png")
 
 # Custom animated title with icon
 st.markdown(
