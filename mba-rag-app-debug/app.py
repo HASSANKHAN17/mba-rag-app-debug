@@ -1,4 +1,3 @@
-
 import os
 import base64
 from dotenv import load_dotenv
@@ -8,10 +7,15 @@ from utils.rag import query_documents
 # Must be first
 st.set_page_config(page_title="MBA ASSISTANT", page_icon="assets/ai_icon.png")
 
+# Load environment variables
 load_dotenv()
 
-# Load CSS
-st.markdown("<style>" + open("style/chatbot.css").read() + "</style>", unsafe_allow_html=True)
+# Load custom CSS safely
+try:
+    with open("style/chatbot.css", "r") as css_file:
+        st.markdown(f"<style>{css_file.read()}</style>", unsafe_allow_html=True)
+except FileNotFoundError:
+    st.warning("⚠️ chatbot.css not found. Using default styles.")
 
 # Function to convert image to base64
 def get_base64_image(image_path):
@@ -20,7 +24,11 @@ def get_base64_image(image_path):
     return f"data:image/png;base64,{encoded}"
 
 # Embed AI icon using base64
-img_base64 = get_base64_image("assets/ai_icon.png")
+try:
+    img_base64 = get_base64_image("assets/ai_icon.png")
+except FileNotFoundError:
+    st.warning("⚠️ AI icon image not found. Icon will not display.")
+    img_base64 = ""
 
 # Custom animated title with icon
 st.markdown(
