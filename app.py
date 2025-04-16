@@ -29,12 +29,40 @@ except FileNotFoundError:
     st.warning("⚠️ AI icon not found.")
     img_base64 = ""
 
-st.markdown(f"""
-<div class='title-container'>
-    <img src="{img_base64}" width='40'/>
-    <div class='title-text'>MBA ASSISTANT</div>
-</div>
-""", unsafe_allow_html=True)
+# st.markdown(f"""
+# <div class='title-container'>
+#     <img src="{img_base64}" width='40'/>
+#     <div class='title-text'>MBA ASSISTANT</div>
+# </div>
+# """, unsafe_allow_html=True)
+    
+
+st.markdown(
+    f"""
+    <style>
+    .title-container {{
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }}
+    .gradient-text {{
+        font-size: 2.2em;
+        font-weight: bold;
+        background: linear-gradient(90deg, #7b2ff7, #0a84ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0;
+    }}
+    </style>
+    <div class='title-container'>
+        <img src="{img_base64}" width='70'/>
+        <div class='gradient-text'>MBA ASSISTANT</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
 
 st.write("Ask questions from your uploaded documents, spreadsheets, or images below.")
 
