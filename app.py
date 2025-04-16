@@ -29,14 +29,6 @@ except FileNotFoundError:
     st.warning("⚠️ AI icon not found.")
     img_base64 = ""
 
-# st.markdown(f"""
-# <div class='title-container'>
-#     <img src="{img_base64}" width='40'/>
-#     <div class='title-text'>MBA ASSISTANT</div>
-# </div>
-# """, unsafe_allow_html=True)
-    
-
 st.markdown(
     f"""
     <style>
@@ -62,13 +54,14 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
-
 st.write("Ask questions from your uploaded documents, spreadsheets, or images below.")
 
-# Session State
+# Initialize session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+if "uploaded_files" not in st.session_state:
+    st.session_state.uploaded_files = []
 
 # Upload files
 uploaded_files = st.file_uploader(
@@ -89,7 +82,6 @@ if user_input:
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            # Try analytics if possible
             try:
                 result = analyze_file(user_input, st.session_state.uploaded_files)
                 if result:

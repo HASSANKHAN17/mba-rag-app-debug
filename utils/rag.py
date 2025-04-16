@@ -26,7 +26,7 @@ def extract_text_from_file(file):
     elif "image" in file.type:
         return extract_text_from_image(file)
     elif file.name.endswith((".csv", ".xls", ".xlsx")):
-        return ""  # analytics handler will use pandas
+        return ""  # Handled separately for analysis
     return "[Unsupported file type]"
 
 def query_documents(query, files=[]):
@@ -41,18 +41,15 @@ Answer:"""
     response = model.generate_content(prompt)
     return response.text
 
-# 🧠 Recognize analytic commands
 def is_analysis_query(query):
-    keywords = ["eda", "regression", "cluster", "visualize", "plot", "scatter", "summary", "describe"]
+    keywords = ["eda", "regression", "cluster", "visualize", "plot", "scatter", "summary", "describe", "correlation", "histogram", "distribution"]
     return any(k in query.lower() for k in keywords)
 
-# 🎯 Run analytics if a data file is present
 def analyze_file(query, files):
     data_file = next((f for f in files if f.name.endswith((".csv", ".xls", ".xlsx"))), None)
     if not data_file or not is_analysis_query(query):
         return None
 
-    # Load data
     try:
         if data_file.name.endswith(".csv"):
             df = pd.read_csv(data_file)
@@ -70,7 +67,6 @@ def analyze_file(query, files):
         summary_text += df.describe().to_markdown()
 
     # Correlation heatmap
-    # Correlation heatmap
     if "correlation" in query.lower() or "eda" in query.lower():
         numeric_df = df.select_dtypes(include="number")
         if not numeric_df.empty:
@@ -78,7 +74,6 @@ def analyze_file(query, files):
             sns.heatmap(numeric_df.corr(), annot=True, cmap="coolwarm")
             plt.title("Correlation Heatmap")
             visuals.append(plt.gcf())
-
 
     # Histogram
     if "distribution" in query.lower() or "hist" in query.lower() or "eda" in query.lower():
