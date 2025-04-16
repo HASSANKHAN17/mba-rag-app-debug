@@ -4,3 +4,6 @@ PyMuPDF
 Pillow
 python-dotenv
 PyPDF2
+pandas
+matplotlib
+seaborn

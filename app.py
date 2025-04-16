@@ -1,16 +1,15 @@
 import os
 import base64
-from dotenv import load_dotenv
 import streamlit as st
-from utils.rag import query_documents
+from dotenv import load_dotenv
+from utils.rag import query_documents, analyze_file
 
 # Must be first
 st.set_page_config(page_title="MBA ASSISTANT", page_icon="assets/ai_icon.png")
 
-# Load environment variables
 load_dotenv()
 
-# Load custom CSS safely
+# Load custom CSS
 try:
     with open("style/chatbot.css", "r") as css_file:
         st.markdown(f"<style>{css_file.read()}</style>", unsafe_allow_html=True)
@@ -23,58 +22,38 @@ def get_base64_image(image_path):
         encoded = base64.b64encode(img_file.read()).decode()
     return f"data:image/png;base64,{encoded}"
 
-# Embed AI icon using base64
+# Custom title
 try:
     img_base64 = get_base64_image("assets/ai_icon.png")
 except FileNotFoundError:
-    st.warning("⚠️ AI icon image not found. Icon will not display.")
+    st.warning("⚠️ AI icon not found.")
     img_base64 = ""
 
-# Custom animated title with icon
-st.markdown(
-    f"""
-    <style>
-    .title-container {{
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }}
-    .title-text {{
-        font-size: 2em;
-        font-weight: bold;
-        background: linear-gradient(90deg, #6a11cb, #2575fc);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: pulse 3s infinite ease-in-out;
-        margin: 0;
-    }}
-    @keyframes pulse {{
-        0% {{ opacity: 1; transform: scale(1); }}
-        50% {{ opacity: 0.85; transform: scale(1.02); }}
-        100% {{ opacity: 1; transform: scale(1); }}
-    }}
-    </style>
-    <div class='title-container'>
-        <img src="{img_base64}" width='40'/>
-        <div class='title-text'>MBA ASSISTANT</div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown(f"""
+<div class='title-container'>
+    <img src="{img_base64}" width='40'/>
+    <div class='title-text'>MBA ASSISTANT</div>
+</div>
+""", unsafe_allow_html=True)
 
-st.write("Ask questions from your uploaded documents, images, or just type queries below.")
+st.write("Ask questions from your uploaded documents, spreadsheets, or images below.")
 
-# Initialize chat history
+# Session State
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# File uploader
-uploaded_files = st.file_uploader("Upload PDFs, images, or docs", type=["pdf", "png", "jpg", "jpeg"], accept_multiple_files=True)
+# Upload files
+uploaded_files = st.file_uploader(
+    "Upload PDFs, images, CSV, or Excel files",
+    type=["pdf", "png", "jpg", "jpeg", "csv", "xls", "xlsx"],
+    accept_multiple_files=True
+)
 if uploaded_files:
     st.session_state.uploaded_files = uploaded_files
 
-# Chat input and response
+# Chat input
 user_input = st.chat_input("Ask a question about your content...")
+
 if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
@@ -82,14 +61,17 @@ if user_input:
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
+            # Try analytics if possible
             try:
-                answer = query_documents(user_input, st.session_state.get("uploaded_files", []))
+                result = analyze_file(user_input, st.session_state.uploaded_files)
+                if result:
+                    st.markdown(result.get("summary", ""))
+                    if "visuals" in result:
+                        for plot in result["visuals"]:
+                            st.pyplot(plot)
+                else:
+                    answer = query_documents(user_input, st.session_state.uploaded_files)
+                    st.markdown(answer)
+                    st.session_state.messages.append({"role": "assistant", "content": answer})
             except Exception as e:
-                answer = f"❌ Error: {e}"
-            st.markdown(answer)
-        st.session_state.messages.append({"role": "assistant", "content": answer})
-
-# Render full chat history
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+                st.error(f"❌ Error: {e}")
